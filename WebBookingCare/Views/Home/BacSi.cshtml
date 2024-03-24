@@ -1,0 +1,72 @@
+﻿@model IEnumerable<WebBookingCare.Models.EF.BacSi>
+
+<section id="doctors" class="doctors section-bg">
+    <div class="container">
+
+        <div class="section-title">
+            <h2>Bác sĩ</h2>
+            <p>Đội ngũ bác sĩ tại bệnh viện là một đội ngũ được tuyển chọn kỹ càng và có trình độ chuyên môn cao. Họ đều là những chuyên gia trong lĩnh vực y tế, có bằng cấp và chứng chỉ chuyên ngành.</p>
+        </div>
+        <div class="locbs">
+            <div class="row ">
+                <div class="col-md-4 form-group mt-3">
+                    <select name="khoa" id="khoa" class="form-select" required>
+                        <option value="">Lọc theo khoa</option>
+                        @{
+                            for (int i = 0; i < Enumerable.Count(ViewBag.Khoa); i++)
+                            {
+                                <option value="@ViewBag.Khoa[i].MaKhoa">@ViewBag.Khoa[i].TenKhoa</option>
+                            }
+                        }
+                    </select>
+                    <div class="validate"></div>
+                </div>
+                <div class="col-md-4 form-group mt-3">
+                    <select name="chucvu" id="chucvu" class="form-select" required>
+                        <option value="">Tìm theo chức vụ</option>
+                        @{
+                            for (int i = 0; i < Enumerable.Count(ViewBag.ChucVu); i++)
+                            {
+                                <option value="@ViewBag.ChucVu[i].MaCV">@ViewBag.ChucVu[i].TenCV</option>
+                            }
+                        }
+                    </select>
+                    <div class="validate"></div>
+                </div>
+                <div class="col-md-4 form-group mt-3">
+                    <select name="gioitinh" id="gioitinh" class="form-select" required>
+                        <option value="">Tìm theo giới tính</option>
+                        <option value="TRUE">Nam</option>
+                        <option value="FALSE">Nữ</option>
+                    </select>
+                    <div class="validate"></div>
+                </div>
+            </div>
+        </div>
+        @Html.Partial("_BacSi")
+    </div>
+</section>
+
+@section scripts {
+    <script>
+        $(function () {
+            const lsbacsi = document.querySelector(".lsbacsi");
+            $('.form-select').change(function () {
+                // Lấy các giá trị được nhập vào trên form
+                const khoa = document.getElementById("khoa").value;
+                const chucvu = document.getElementById("chucvu").value;
+                const gioitinh = document.getElementById("gioitinh").value;
+                $.ajax({
+                    url: "/home/_BacSi",
+                    type: "POST",
+                    data: { khoa: khoa, chucvu: chucvu, gioitinh: gioitinh },
+                    success: function (data) {
+                        $('.dsbacsi').html(data);
+
+                    },
+                });
+            });
+        })
+
+    </script>
+}

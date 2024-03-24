@@ -1,0 +1,122 @@
+﻿@model IEnumerable<WebBookingCare.Models.EF.CaKham>
+
+@{
+    ViewBag.Title = "DanhSach";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<div class="card-header py-3">
+    <h4 class="m-0 font-weight-bold text-primary text-center">DANH SÁCH CA KHÁM</h4>
+    <hr />
+</div>
+<div class="danhsachbs">
+    <div class="dsck m-3">
+        <table class="table table table-bordered display">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.TenCa)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ThoiGianBD)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ThoiGianKT)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.SoLuongKham)
+                </th>
+                <th>
+                    Chức năng
+                </th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TenCa)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ThoiGianBD)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ThoiGianKT)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SoLuongKham)
+                    </td>
+                    <td>
+                        <!-- Chi tiết -->
+                        <a href="@Url.Action("ChiTiet", "CaKham", new { id = item.MaCa })" class="btn btn-sm btn-info">
+                            <span class="bi bi-info-circle"></span>
+                        </a>
+
+                        <!-- Sửa -->
+                        <a href="@Url.Action("SuaCaKham", "CaKham", new { id = item.MaCa })" class="btn btn-sm btn-warning">
+                            <span class="bi bi-pencil-square"></span>
+                        </a>
+
+                        <!-- Xóa -->
+                        @if (item.TrangThai == true)
+                        {
+                            <button type="button" class="btn btn-outline-success btn-sm toggle-cakham-status"
+                                    data-caid="@item.MaCa" data-status="unlocked">
+                                <i class="fas fa-unlock"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-outline-danger btn-sm toggle-cakham-status"
+                                    data-caid="@item.MaCa" data-status="locked">
+                                <i class="fas fa-lock"></i>
+                            </button>
+                        }
+                    </td>
+                </tr>
+            }
+
+        </table>
+    </div>
+</div>
+@section scripts
+    {
+    <script>
+        $(document).ready(function () {
+            $('.toggle-cakham-status').click(function () {
+                var btn = $(this);
+                var caId = btn.data('caid');
+                var status = btn.data('status');
+                var url = '/admin/cakham/KhoaCaKham';
+                var data = { maca: caId, status: status };
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: data,
+                    success: function (result) {
+                        if (result.success) {
+                            if (status === 'unlocked') {
+                                btn.removeClass('btn-outline-success').addClass('btn-outline-danger');
+                                btn.find('i').removeClass('fas fa-unlock').addClass('fas fa-lock');
+                                btn.find('span').text('Khóa');
+                                btn.data('status', 'locked');
+                            } else {
+                                btn.removeClass('btn-outline-danger').addClass('btn-outline-success');
+                                btn.find('i').removeClass('fas fa-lock').addClass('fas fa-unlock');
+                                btn.find('span').text('Kích Hoạt');
+                                btn.data('status', 'unlocked');
+                            }
+                        } else {
+                            alert(result.message);
+                        }
+                    },
+                    error: function () {
+                        alert('Đã xảy ra lỗi khi cập nhật trạng thái tài khoản.');
+                    }
+                });
+            });
+        });
+    </script>
+}
